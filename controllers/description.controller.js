@@ -1,8 +1,15 @@
 const Description = require("../schemas/Description");
 const { sendErrorresponse } = require("../helpers/send_error_response");
+const { descriptionValidation } = require("../validation/description.validation");
+
 
 const addDescription = async (req, res) => {
   try {
+    const { error, value } = descriptionValidation(req.body);
+
+    if (error) {
+      return sendErrorresponse(error, res);
+    }
     const { category_id, description } = req.body;
     const newDescription = await Description.create({
       category_id,
@@ -45,11 +52,17 @@ const findByCategoryId = async (req, res) => {
 
 const update = async (req, res) => {
   try {
+    const { error, value } = descriptionValidation(req.body);
+
+    if (error) {
+      return sendErrorresponse(error, res);
+    }
     const updatedDescription = await Description.findByIdAndUpdate(
       req.params.id,
       req.body,
       {
         new: true,
+        runValidators: true,
       }
     );
     res

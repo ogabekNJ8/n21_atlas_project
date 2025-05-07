@@ -1,8 +1,14 @@
 const Category = require("../schemas/Category");
 const { sendErrorresponse } = require("../helpers/send_error_response");
+const { categoryValidation } = require("../validation/category.validation");
 
 const addCategory = async (req, res) => {
   try {
+    const { error, value } = categoryValidation(req.body);
+
+    if (error) {
+      return sendErrorresponse(error, res);
+    }
     const { category_name, parent_category_id } = req.body;
     const newCategory = await Category.create({
       category_name,
@@ -45,11 +51,17 @@ const findChildCategories = async (req, res) => {
 
 const update = async (req, res) => {
   try {
+    const { error, value } = categoryValidation(req.body);
+
+    if (error) {
+      return sendErrorresponse(error, res);
+    }
     const updatedCategory = await Category.findByIdAndUpdate(
       req.params.id,
       req.body,
       {
         new: true,
+        runValidators: true,
       }
     );
     res

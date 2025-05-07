@@ -1,9 +1,16 @@
 const Dict = require("../schemas/Dict");
-const {sendErrorresponse} = require("../helpers/send_error_response");
+const { sendErrorresponse } = require("../helpers/send_error_response");
+const { dictValidation } = require("../validation/dict.validation");
 
 const addDict = async (req, res) => {
   try {
-    const { term } = req.body;
+    const { error, value } = dictValidation(req.body);
+
+    if (error) {
+      return sendErrorresponse(error, res);
+    }
+
+    const { term } = value;
     const newDict = await Dict.create({ term, letter: term[0] });
     res.status(201).send({ message: "New Term added", newDict });
   } catch (error) {
@@ -42,8 +49,14 @@ const findByLetter = async (req, res) => {
 
 const update = async (req, res) => {
   try {
+    const { error, value } = dictValidation(req.body);
+
+    if (error) {
+      return sendErrorresponse(error, res);
+    }
     const updatedDic = await Dict.findByIdAndUpdate(req.params.id, req.body, {
       new: true,
+      runValidators: true,
     });
     res.status(200).send({ message: "Value updated", data: updatedDic });
   } catch (error) {
@@ -67,5 +80,5 @@ module.exports = {
   findById,
   update,
   remove,
-  findByLetter
+  findByLetter,
 };

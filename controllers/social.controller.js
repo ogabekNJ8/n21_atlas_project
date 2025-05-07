@@ -1,8 +1,15 @@
 const Social = require("../schemas/Social");
 const { sendErrorresponse } = require("../helpers/send_error_response");
+const { socialValidation } = require("../validation/social.validation");
 
 const add = async (req, res) => {
   try {
+    const { error, value } = socialValidation(req.body);
+
+    if (error) {
+      return sendErrorresponse(error, res);
+    }
+
     const { social_name, social_icon_file } = req.body;
     const newsocial = await Social.create({ social_name, social_icon_file });
     res.status(201).send({ message: "New social added", newsocial });
@@ -32,10 +39,15 @@ const findById = async (req, res) => {
 
 const update = async (req, res) => {
   try {
+    const { error, value } = socialValidation(req.body);
+
+    if (error) {
+      return sendErrorresponse(error, res);
+    }
     const updatedSocial = await Social.findByIdAndUpdate(
       req.params.id,
       req.body,
-      { new: true }
+      { new: true, runValidators: true }
     );
     res.status(200).send({ message: "Value updated", data: updatedSocial });
   } catch (error) {
