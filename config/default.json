@@ -1,0 +1,4 @@
+{
+  "PORT": 3333,
+  "dbUri": "mongodb+srv://admin:12345@cluster0.hydrr4s.mongodb.net/itterm?retryWrites=true&w=majority&appName=Cluster0"
+}
